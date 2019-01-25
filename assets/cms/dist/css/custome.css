@@ -1,0 +1,36 @@
+
+.table_pembuka {
+	border-collapse: collapse;
+	border-spacing: 0;
+	width: 100%;
+}
+.table_pembuka > thead > tr > th, .table_pembuka > tbody > tr > th, .table_pembuka > tfoot > tr > th, .table_pembuka > thead > tr > td, .table_pembuka > tbody > tr > td, .table_pembuka > tfoot > tr > td {
+	border-top: 0;
+	line-height: 1.42857;
+	padding: 8px;
+	vertical-align: top;
+}
+
+.tablex > thead > tr > th, .tablex > tbody > tr > th, .tablex > tfoot > tr > th, .tablex > thead > tr > td, .tablex > tbody > tr > td, .tablex > tfoot > tr > td {
+    border: 1px solid #ddd;
+    line-height: 1.42857;
+    padding: 3px;
+    vertical-align: top;
+
+}
+
+.h_tengah {
+	text-align: center;
+}
+
+.h_kanan {
+	text-align: right;
+}
+
+.h_kiri {
+	text-align: left;
+}
+
+.header_kolom {background-color: #eee; text-align: center; font-weight: bold;}
+.x_scroll {overflow-x:auto; padding-bottom:10px;}
+.x_scroll_1 {overflow-x:scroll; padding-bottom:10px; width:1500px}
