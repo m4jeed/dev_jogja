@@ -41,8 +41,8 @@ class Withdraw extends MY_Jogja {
 			$ids=$row['ids'];
 			$output['data'][]=array($nomor_urut
 									 ,$row['nama_pemilik']
-									 ,$row['nominal']
-									 ,$row['balance']
+									 ,number_format($row['nominal'],0)
+									 ,number_format($row['balance'],0)
 									 ,$row['no_rekening']
 									 ,$row['nama_bank']
 									 ,$row['request_on']
@@ -73,66 +73,36 @@ class Withdraw extends MY_Jogja {
 		}
 	}
 
-	public function jsonDeleteData(){ 
-		if($this->input->post()){
-			$this->form_validation->set_rules('ids', 'ids', 'trim|required');
-			if ($this->form_validation->run() == FALSE){
-				$data=array('status'=>'error_val','data'=>$this->form_validation->error_array());
-			}else{
-				$ids=strip_tags(trim($this->input->post('ids',true)));
-				$data['is_active']='0';
-				$data['updated_by']=$this->session->userdata('uname');
-				$data['updated_on']=date('Y-m-d H:i:s');
-				$result=$this->berita->update_data($ids,$data);
-				if($result){
-					$data=array('status'=>'sukses','data'=>'Success Delete Data');
-				}else{
-					$data=array('status'=>'error','data'=>'Error Delete Data');
-				}
-			}
-			echo json_encode($data);
-		}else{
-			$data=array('status'=>'error','data'=>'Only POST Data');
-			echo json_encode($data);
-		}
-	}
-
 	public function jsonUpdateData(){ 
 		if($this->input->post()){
 			$id=strip_tags(trim($this->input->post('ids',true)));
 			$data['status']=strip_tags(trim($this->input->post('status',true))); 
-			//$data['verifikasi_msg']=strip_tags(trim($this->input->post('verifikasi_msg',true)));
-			if($data['status']=='Berhasil'){
-				//$data['is_verified']='1';
-				$data['approve_on']=date('Y-m-d H:i:s');
-				$data['approve_by']=$this->session->userdata('uname');
 			
-				$res=$this->db->query("select * from withdraw_request where ids='".$id."'")->row_array();
+			if( $data['status']=='Berhasil' ){
+				$data['approve_by']=$this->session->userdata('uname');
+				$data['approve_on']=date('Y-m-d H:i:s');
+				
+				$rsGetData = $this->withdraw->get_one_get($id);
+				$withdraw_req = $rsGetData[0]['user_id'];
+				$nom_jogja_acc = $rsGetData[0]['balance'] - $rsGetData[0]['nominal'];
+				$dataVacc = array('balance' => $nom_jogja_acc);
+
+				$this->withdraw->update_vacc($withdraw_req, $dataVacc);
+
+			}else if( $data['status']=='Reject' ){
+				$data['approve_by']=$this->session->userdata('uname');
+				$data['approve_on']=date('Y-m-d H:i:s');
 				
 			}else{
-				
-				//$data['is_verified']='0';
-				$data['approve_on']=date('Y-m-d H:i:s');
 				$data['approve_by']=$this->session->userdata('uname');
-				//$data['created_on']=date('Y-m-d H:i:s');
-				$res=$this->db->query("select * from withdraw_request where ids='".$id."'")->row_array();
-				
+				$data['approve_on']=date('Y-m-d H:i:s');
 			}
 			
-			$rsGetData = $this->withdraw->get_one_get($id);
-			$withdraw_req = $rsGetData[0]['user_id'];
-			$nom_jogja_acc = $rsGetData[0]['balance'] - $rsGetData[0]['nominal'];
-			
-			$dataVacc = array('balance' => $nom_jogja_acc);
-			$this->withdraw->update_vacc($withdraw_req, $dataVacc);
-
-			$dataWithdraw = array(
-				'status' => 'Berhasil',				
-			);
-			
-			$result=$this->withdraw->update_data($id,$dataWithdraw); 
-			if($result=='1'){
-				$data = array('status'=>'sukses','data'=>'Success Approve Data'); 
+			$this->withdraw->update_data($id, $data); 
+			if($data['status']=='Berhasil'){
+				$data = array('status'=>'sukses','data'=>'Success Approve Data');
+			}else if($data['status']=='Reject'){
+				$data = array('status'=>'reject','data'=>'Success Reject Data'); 
 			}else{
 				$data=array('status'=>'error','data'=>'Error Update Data'); 
 			}
@@ -145,3 +115,5 @@ class Withdraw extends MY_Jogja {
 
 
 }
+
+//update controllers

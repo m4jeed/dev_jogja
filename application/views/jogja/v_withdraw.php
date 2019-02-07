@@ -35,17 +35,18 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Detil Withdraw</h4>
+        <h4 class="modal-title">Detail Withdraw</h4>
       </div>
       <div class="modal-body">
         <div class="row">
           <div class="col-md-6">
+            <input type="hidden" class="form-control" id="ids">
             <div class="form-group">
               <label>Nama Pemilik</label>
               <input type="text" class="form-control" id="nama_pemilik" readonly>
             </div>
             
-            <input type="hidden" class="form-control" id="ids">
+            
             <div class="form-group">
               <label>Saldo Jogjaaccess</label>
               <input type="text" class="form-control" id="balance" readonly>
@@ -79,6 +80,7 @@
               <?php 
                 $options=array(
                         'On Process'=>'On Process',
+                        'Reject'=>'Reject',
                         'Berhasil'=>'Berhasil');
                 echo form_dropdown('status', $options, '','class="form-control" id="status"');
               
@@ -110,9 +112,6 @@
       ajax: {
         url: "<?php echo base_url($this->uri->segment(1).'/'.$this->uri->segment(2).'/ajax_list') ?>",
         type:'POST',
-        // success:function(data){
-        //  console.log(data)
-        // }
       }
       
     });
@@ -120,26 +119,15 @@
     })
 </script>
 
-<!-- <script>
-  <-fungsi buat load halaman lain js->
-  function showEditData(ids){
-    var page =window.location.href;
-    window.location=page + '/jsonGetOneData/' + ids;
-    jsonGetOneData(ids)
-  }
-</script> -->
 
 <script>
   function showEditData(ids){
-    // var page =window.location.href;
-    // window.location=page + '/jsonGetOneData/' + ids;
     jsonGetOneData(ids)
-    // $('#myModal').modal('show');
   }
 </script>
 
 <script>
-  function jsonGetOneData(post_id){ //ambil data sesui idnya
+  function jsonGetOneData(post_id){ 
     $.ajax({
     url: '<?php echo base_url();?>jogja/withdraw/jsonGetOneData',
     type: 'POST',
@@ -162,7 +150,7 @@
           $('#myModal').modal('show');
           //console.log(value);
           $('#ids').val(value.ids);
-          $('#user_id').val(value.user_id);
+          $('#user_id').val(value.fullname);
           $('#nama_pemilik').val(value.nama_pemilik);
           $('#nominal').val(value.nominal);
           $('#balance').val(value.balance);
@@ -170,7 +158,6 @@
           $('#nama_bank').val(value.nama_bank);
           $('#approve_by').val(value.approve_by);
           $('#status').val(value.status);
-          // $('#selfi_photo').html('<img src="<?php //echo base_url();?>assets/users_image/'+value.id_card_number_photo+'" width="300" height="200">');
         }else{
           alert(json['data']);
         }
@@ -186,25 +173,43 @@
 
 <script>
   function jsonUpdateData(){
-    // var is_confirmed_hp=$('#is_confirmed_hp').val();
-    // var is_confirmed_email=$('#is_confirmed_email').val();
-    
-    // if(is_confirmed_email!='1'){
-    //   alert('EMail belum dikonfirmasi');
-    //   return false
+    var balance=$('#balance').val();
+    var nominal=$('#nominal').val();
+    //console.log(balance+' '+nominal);
+
+    if (parseInt(balance) > parseInt(nominal)){
+      //alert('Lanjutkan');
+      status:$('#status').val(),
+      window.location.href="<?php echo site_url(uri_string());?>";
+      
+    }else{
+
+      alert('Maaf Saldo Anda Tidak Cukup');
+      return true
+      
+    }
+
+    // var JmlNominal=$('#nominal').val();
+    // var JmlWithdraw =25000;
+    //console.log(JmlNominal+' '+JmlWithdraw);
+
+    // if (parseInt(JmlNominal) >= parseInt(JmlWithdraw)){
+
+    //   status:$('#status').val(),
+    //   window.location.href="<?php //echo site_url(uri_string());?>";
+      
+    // }else{
+
+    //   alert('Maaf Minimal Withdraw Harus Rp.25.000');
+    //   return true
+
     // }
-    
-    // if(is_confirmed_hp!='1'){
-    //   alert('Handphone belum dikonfirmasi');
-    //   return false
-    // }
+
 
    $.ajax({
     url: '<?php echo base_url();?>jogja/withdraw/jsonUpdateData', 
     type: 'POST',
     data: {ids:$('#ids').val(),
-    // nominal:$('#nominal').val(),
-    // balance:$('$balance').val(),
         status:$('#status').val(),
         //console.log()
         //verifikasi_msg:$('#verifikasi_msg').val(),
@@ -221,15 +226,33 @@
       success: function(json) {
         if(json['status']=='sukses'){
           var value=json['data'];
+      
           alert(value);
-          //alert($('#nominal').val(value.nominal));
+
           $('#myModal').modal('hide');
           window.location.href="<?php echo site_url(uri_string());?>";
+
         }else{
           alert(json['data']);
         }
         
       },
+
+      reject: function(json) {
+        if(json['status']=='reject'){
+          var value=json['data'];
+      
+          alert(value);
+
+          $('#myModal').modal('hide');
+          window.location.href="<?php echo site_url(uri_string());?>";
+
+        }else{
+          alert(json['data']);
+        }
+        
+      },
+
       error: function() {
         alert("Error occured. Please try again or contact administrator");
         
@@ -237,10 +260,8 @@
 
     });
     
-    // alert($('#nominal').val(value.nominal));
-    // alert("MAJID");
   
   }
 </script>
 
-
+<!--update views -->

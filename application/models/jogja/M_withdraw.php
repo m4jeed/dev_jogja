@@ -3,7 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_withdraw extends CI_Model{
 	var $table = 'withdraw_request';
-	//var $column_order = array(null, 'news_title');
 	var $column_order = array(null, 'nama_pemilik','nominal','no_rekening','nama_bank','approve_by','status');
 	var $column_search = array('news_title');
 	var $order = array('ids' => 'asc');
@@ -34,7 +33,8 @@ class M_withdraw extends CI_Model{
 			INNER JOIN ma_users
 			ON withdraw_request.request_by=ma_users.user_id
 			WHERE ma_vacc.user_id
-			AND status='On Process'
+			AND status IN ('On Process','Reject')
+			
 			AND (nama_pemilik LIKE '%".$keyword."%'
 			OR nominal LIKE '%".$keyword."%'
 			OR no_rekening LIKE '%".$keyword."%'
@@ -58,7 +58,7 @@ class M_withdraw extends CI_Model{
 			INNER JOIN ma_users
 			ON withdraw_request.request_by=ma_users.user_id
 			WHERE ma_vacc.user_id
-			AND status='On Process'
+			AND status IN ('On Process','Reject') 
 			AND (nama_pemilik LIKE '%".$keyword."%'
 			OR nominal LIKE '%".$keyword."%'
 			OR no_rekening LIKE '%".$keyword."%'
@@ -70,17 +70,20 @@ class M_withdraw extends CI_Model{
 	function get_one($id){
 		$sql="SELECT withdraw_request.*,
 		    ma_vacc.user_id,
-			ma_vacc.balance			
+			ma_vacc.balance,
+			ma_users.fullname			
 			FROM withdraw_request
 			INNER JOIN ma_vacc
 			ON withdraw_request.request_by=ma_vacc.user_id
+			INNER JOIN ma_users
+			ON withdraw_request.request_by=ma_users.user_id
 			WHERE withdraw_request.ids='".$id."' ";
 		return $this->db->query($sql)->row_array(); 
 	}
 
 	//kalo hasilnya pngn per row maka pake row_array
 	function get_one_get($id){
-		$sql = 'SELECT * FROM withdraw_request INNER JOIN ma_vacc ON withdraw_request.request_by = ma_vacc.user_id WHERE withdraw_request.ids = '. $id .' LIMIT 1';
+		$sql = "SELECT * FROM withdraw_request INNER JOIN ma_vacc ON withdraw_request.request_by = ma_vacc.user_id WHERE withdraw_request.ids = '".$id."' LIMIT 1 ";
 		return $this->db->query($sql)->result_array(); 
 	}
 
@@ -90,9 +93,11 @@ class M_withdraw extends CI_Model{
 		return $this->db->affected_rows();
 	}
 	
-	function update_vacc($user_id,$data){ 
-		$this->db->where('user_id',$user_id);
-		$this->db->update('ma_vacc',$data);
+	function update_vacc($withdraw_req, $dataVacc){ 
+		$this->db->where('user_id',$withdraw_req);
+		$this->db->update('ma_vacc',$dataVacc);
 		return $this->db->affected_rows();
 	}
 }
+
+//update models
