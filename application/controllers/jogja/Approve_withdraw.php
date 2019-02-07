@@ -15,7 +15,6 @@ class Approve_withdraw extends MY_Jogja {
 		$data['box_title']='List';
 		$data['content']='jogja/v_approve_withdraw';
 		$this->load->view('jogja/template',$data);
-		
 	}
 
 	public function ajax_list(){
@@ -56,3 +55,5 @@ class Approve_withdraw extends MY_Jogja {
 		echo json_encode($output);
 	}
 }
+
+//update
