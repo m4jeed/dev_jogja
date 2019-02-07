@@ -10,8 +10,7 @@ class Verified_masterusers extends MY_Jogja {
 		$this->load->library('session');
 	}
 
-	public function index()
-	{
+	public function index(){
 		$data['top_title']='Master Users Last Verified';
 		$data['box_title']='List';
 		$data['content']  ='jogja/v_verified_masterusers';
@@ -40,9 +39,8 @@ class Verified_masterusers extends MY_Jogja {
 		$nomor_urut=$start+1;
 		foreach ($query as $row) {
 			$user_id=$row['user_id'];
+			$vacc   =$row['vacc_number'];
 			$output['data'][]=array($nomor_urut
-									 // ,$row['poin']
-									 // ,$row['status_verifikasi']
 									,$row['fullname']
 									,$row['my_referal_code']
 									,$row['referal_code']
@@ -52,10 +50,47 @@ class Verified_masterusers extends MY_Jogja {
 									,number_format($row['balance'],0)
 									,number_format($row['poin'],0)
 									,$row['created_on']
+									,'<center><a href="javascript:void(0)" class="btn btn-info btn-sm" onclick="showModalData('.$user_id.')">Detail</a>
+										<a href="javascript:void(0)" class="btn btn-warning btn-sm" onclick="showVaccNumber('.$vacc.')">Vacc</a>
+									</center>'
 									);
 			$nomor_urut++;
 		}
 
 		echo json_encode($output);
 	}
+
+	public function jsonGetOneData(){
+		$data['top_title']='Detail List Masterusers';
+		$data['box_title']='List';
+		$data['content']='jogja/v_detailverified';
+
+		$user_id=$this->uri->segment(4);
+		$result=$this->verified->get_one($user_id);
+		
+		if($result){
+			$data['ambil']=array('status'=>'sukses','data'=>$result);
+		}else{
+			$data['ambil']=array('status'=>'error','data'=>'Error Insert Data');
+		}
+
+		// echo "<pre>";
+		// print_r($data);
+		$this->load->view('jogja/template',$data);
+
+		// die;
+	}
+
+	public function jsonGetVacc(){
+		$data['top_title']='Detail List Vacc Number';
+		$data['box_title']='List';
+		$data['content']='jogja/v_detailvacc';
+
+		$vacc=$this->uri->segment(4);
+		$data['data_vacc']=$this->verified->get_one_vacc($vacc);
+		$this->load->view('jogja/template',$data);
+
+	}
 }
+
+/*update*/
