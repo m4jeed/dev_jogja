@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+//Baru nih
 
 class Masterusers extends MY_Jogja {
 	var $column_order = array(null, 'fullname','phone','email','vacc_number','balance','poin','is_confirmed_email','is_confirmed_hp',null); 
@@ -78,6 +79,7 @@ class Masterusers extends MY_Jogja {
 		if($this->input->post()){
 			$user_id=strip_tags(trim($this->input->post('user_id',true)));
 			$data['status_verifikasi']=strip_tags(trim($this->input->post('status_verifikasi',true)));
+			$data['verifikasi_msg']=strip_tags(trim($this->input->post('verifikasi_msg',true)));
 			if($data['status_verifikasi']=='berhasil'){
 				$data['is_verified']='1';
 				$data['verified_on']=date('Y-m-d H:i:s');
@@ -103,19 +105,19 @@ class Masterusers extends MY_Jogja {
 			//$rere=$dataPoin['my_referal_code'];
 			//var_dump($rere);die();
 
-			$poin = array('poin' => $nominal);
+			$poin 			= array('poin' => $nominal);
 			$this->muser->update_vacc($req_poin,$poin);
 
-			$referal=$this->muser->get_one_get($user_id);
-			$RefAtas		=$referal['referal_code'];
+			$referal 		= $this->muser->get_one_get($user_id);
+			$RefAtas		= $referal['referal_code'];
 			//var_dump($RefAtas);die();
 
 			//FUNGSI BUAT NAMBAH 5 POIN DI USER BARU & USER LAMA 2 POIN
 			$datareferal = $this->muser->get_one_geting($RefAtas);
-
-			$user_id_ref = $datareferal['user_id'];
-			$nom = $datareferal['poin'] + 2;
-			$poin_ref = array('poin' => $nom);
+			
+			$user_id_ref 	= $datareferal['user_id'];
+			$nom 			= $datareferal['poin'] + 2;
+			$poin_ref 		= array('poin' => $nom);
 
 			$this->muser->update_poin_atasan($user_id_ref,$poin_ref);
 			//var_dump($referal['referal_code']);die();
@@ -161,6 +163,37 @@ class Masterusers extends MY_Jogja {
 			$data=array('status'=>'error','data'=>'Only POST Data');
 			echo json_encode($data);
 		}
+	}
+
+	public function jsonSendMailKonfirmasi(){
+		//$result=$this->muser->get_one($user_id);
+		//$test=$this->jsonGetOneData();
+		$user_id=$this->session->userdata('user_id');
+		$data=$this->muser->get_one($user_id);
+		//var_dump($data);die();
+		$this->load->library('lib_phpmailer_jogja');
+		$to=$data['email'];
+		$subject='Selamat Datang di JogjaAccess';
+		$this->load->model('M_template_email');
+		$message=$this->M_template_email->verify_hp($data['email_key']);
+		$send_email=$this->lib_phpmailer_jogja->send_email($to,$subject,$message,true);
+		//var_dump($send_email);die();
+		//------------------------------------
+		$this->result=$data;
+		
+		if($send_email){
+			$data=array('status'=>'sukses','data'=>'Success Resend Email');
+		}else{
+			$data=array('status'=>'error','data'=>'Error Update Data');
+			//send sms otp
+			$this->load->helper('thirdparty');
+			$telepon='085779801499';
+			$message='SEND MAIL ERROR '.$to;
+			$res=MASendSms($telepon,$message);
+			//--------------
+			 
+		}
+		echo json_encode($data);
 	}
 
 }
