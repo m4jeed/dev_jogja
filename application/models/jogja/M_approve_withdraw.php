@@ -33,9 +33,7 @@ class M_approve_withdraw extends CI_Model{
 			ON withdraw_request.request_by=ma_vacc.user_id
 			INNER JOIN ma_users
 			ON withdraw_request.request_by=ma_users.user_id
-			WHERE ma_vacc.user_id
-			AND status='Berhasil'
-			AND ma_users.is_verified='1'
+			WHERE status='Berhasil'
 			AND (nama_pemilik LIKE '%".$keyword."%'
 			OR nominal LIKE '%".$keyword."%'
 			OR no_rekening LIKE '%".$keyword."%'
@@ -56,11 +54,9 @@ class M_approve_withdraw extends CI_Model{
 			FROM withdraw_request
 			INNER JOIN ma_vacc
 			ON withdraw_request.request_by=ma_vacc.user_id
-			INNER JOIN ma_users
+			JOIN ma_users
 			ON withdraw_request.request_by=ma_users.user_id
-			WHERE ma_vacc.user_id
-			AND status='Berhasil'
-			AND ma_users.is_verified='1'
+			WHERE status='Berhasil'
 			AND (nama_pemilik LIKE '%".$keyword."%'
 			OR nominal LIKE '%".$keyword."%'
 			OR no_rekening LIKE '%".$keyword."%'
@@ -70,3 +66,5 @@ class M_approve_withdraw extends CI_Model{
 	}
 
 }
+
+//update
