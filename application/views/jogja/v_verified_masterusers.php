@@ -25,6 +25,7 @@
           <th>Balance</th>
           <th>Poin</th>
           <th>Created On</th>
+          <th>Aksi</th>
 	      </tr>
       </thead>
 		</table>
@@ -49,3 +50,35 @@
     })
     })
 </script>
+
+<script>
+  function showModalData(user_id){
+    var page =window.location.href;
+    window.location=page + '/jsonGetOneData/' + user_id;
+    jsonGetOneData(user_id)
+  }
+
+  function showVaccNumber(vacc_number){
+    var page =window.location.href;
+    window.location=page + '/jsonGetVacc/' + vacc_number;
+    jsonGetOneData(vacc_number)
+  }
+</script>
+
+<script>
+  success: function(json) {
+        if(json['status']=='sukses'){
+          var modalImg1 = document.getElementById("img01");
+          modalImg1.src = "<?php echo base_url();?>/assets/users_image/"+value.id_card_number_photo;
+          
+          var modalImg2 = document.getElementById("img02");
+          modalImg2.src = "<?php echo base_url();?>/assets/users_image/"+value.id_card_number_selfi;
+
+        }else{
+          alert(json['data']);
+        }
+        
+      },
+</script>
+
+<!--update-->
