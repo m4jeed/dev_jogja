@@ -62,7 +62,7 @@ class M_masterusers extends CI_Model{
 			FROM ma_users
 			INNER JOIN ma_vacc
 			ON ma_users.user_id=ma_vacc.user_id
-			INNER JOIN base_postalcode
+			LEFT JOIN base_postalcode
 			ON ma_users.postalcode_id=base_postalcode.ids
 			WHERE ma_users.user_id='".$user_id."'";
 		return $this->db->query($sql)->row_array();
@@ -115,3 +115,5 @@ class M_masterusers extends CI_Model{
 
 
 }
+
+//prubahan model
