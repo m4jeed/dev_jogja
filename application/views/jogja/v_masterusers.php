@@ -38,7 +38,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Detil Jogja Member</h4>
+        <h4 class="modal-title">Detail Jogja Member</h4>
       </div>
       <div class="modal-body">
         <div class="row">
@@ -75,6 +75,11 @@
             </div>
 
             <div class="form-group">
+              <label>Gerai Name</label>
+              <input type="text" class="form-control" id="gerai_name" readonly>
+            </div>
+
+            <div class="form-group">
               <label>POB</label>
               <input type="text" class="form-control" id="pob" readonly>
             </div>
@@ -98,10 +103,11 @@
               <label>Address</label>
               <input type="text" class="form-control" id="address" readonly>
             </div>
-            <!-- <div class="form-group">
-              <label>Photo Id Card</label>
-              <div class="" id="card_photo"></div> 
-            </div> -->
+
+            <div class="form-group">
+              <label>Postalcode</label>
+              <input type="text" class="form-control" id="postalcode" readonly>
+            </div>
           </div>
 
           <div class="col-md-6">
@@ -182,6 +188,7 @@
         </div>
       </div>
       <div class="modal-footer">
+        <a href="javascript:void(0)" class="btn btn-success" onclick="jsonSendMail()">Send Email</a>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <a href="javascript:void(0)" class="btn btn-primary" onclick="jsonUpdateData()">Approval</a>
       </div>
@@ -241,10 +248,12 @@
           $('#referal_code').val(value.referal_code);
           $('#poin').val(value.poin);
           $('#balance').val(value.balance);
+          $('#gerai_name').val(value.gerai_name);
           $('#pob').val(value.pob);
           $('#dob').val(value.dob);
           $('#id_card_number').val(value.id_card_number);
           $('#address').val(value.address);
+          $('#postalcode').val(value.postalcode);
           $('#mom').val(value.mom);
           $('#created_on').val(value.created_on);
           $('#status_verifikasi').val(value.status_verifikasi);
@@ -328,5 +337,41 @@
     
   
   }
+
+  function jsonSendMail(){
+    
+    $.ajax({
+    url: '<?php echo base_url();?>jogja/masterusers/jsonSendMailKonfirmasi',
+    type: 'POST',
+    dataType: 'json',
+      beforeSend: function() {
+        $.LoadingOverlay("show");
+        
+      },
+      complete: function() {
+        $.LoadingOverlay("hide");
+        
+      },
+      success: function(json) {
+        if(json['status']=='sukses'){
+          var value=json['data'];
+          alert(value);
+          $('#myModal').modal('hide');
+          window.location.href="<?php echo site_url(uri_string());?>";
+        }else{
+          alert(json['data']);
+        }
+        
+      },
+      error: function() {
+        alert("Error occured. Please try again or contact administrator");
+        
+      }
+    });
+    
+  
+  }
 </script>
+
+<!--perubahan view -->
 
